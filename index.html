@@ -2,65 +2,79 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Papağan Arşivi</title>
+<title>Kuş Arşivi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body { font-family: Arial; margin:0; background:#f2f2f2 }
-header { background:#2196f3; padding:15px; color:white }
+body { margin:0; font-family:Arial; background:#f4f4f4 }
+header { background:#1976d2; padding:12px }
 input {
   width:100%; padding:10px; font-size:16px;
-  border:none; border-radius:6px;
+  border:none; border-radius:6px
 }
 .card {
   background:white; margin:12px; padding:12px;
-  border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,.1)
+  border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,.15)
 }
 .badge {
-  display:inline-block; padding:4px 8px;
-  border-radius:5px; font-size:12px; color:white
+  padding:4px 8px; border-radius:5px;
+  font-size:12px; color:white; display:inline-block
 }
-img { width:100%; max-height:180px; object-fit:cover; border-radius:6px }
+img {
+  width:100%; height:180px; object-fit:cover;
+  border-radius:6px; margin-bottom:8px
+}
 </style>
 </head>
 <body>
 
 <header>
-  <input id="search" placeholder="Papağan ara...">
+  <input id="search" placeholder="Kuş ara...">
 </header>
 
 <div id="list"></div>
 
 <script>
-const parrotNames = [
-  "Afrika Gri Papağanı","Mavi Altın Macaw","Kızıl Macaw",
-  "Yeşil Kanatlı Macaw","Sultan Papağanı","Cennet Papağanı",
-  "Gökkuşağı Lori","Amazon Papağanı","Kakadu",
-  "Jako Papağanı","Ekletus Papağanı","Alexandrine Papağanı",
-  "Quaker Papağanı","Senegal Papağanı","Palm Kakadu",
-  "Hyacinth Macaw","Rose-ringed Parakeet"
+const species = [
+  "Sultan Papağanı","Cennet Papağanı","Jako Papağanı",
+  "Macaw","Amazon Papağanı","Kakadu","Lori",
+  "Alexandrine Papağanı","Quaker Papağanı",
+  "Saka Kuşu","Bülbül","İspinoz","Kanarya",
+  "Flamingo","Turna","Toy Kuşu","Akbaba",
+  "Şahin","Kartal","Baykuş"
 ];
 
-const rarities = [
-  {name:"Evcıl", color:"#4caf50"},
-  {name:"Nadir", color:"#ff9800"},
-  {name:"Çok Nadir", color:"#9c27b0"},
-  {name:"Efsanevi", color:"#f44336"}
+const mutations = [
+  "Normal","Albino","Lutino","Blue","Pied",
+  "Cinnamon","Opaline","White Face","Golden"
 ];
 
-let birds = JSON.parse(localStorage.getItem("birds"));
+const statuses = [
+  {name:"Evcil", color:"#4caf50"},
+  {name:"Vahşi", color:"#607d8b"},
+  {name:"Tükenmekte Olan", color:"#ff9800"},
+  {name:"Nesli Tükenen", color:"#f44336"}
+];
+
+let birds = JSON.parse(localStorage.getItem("birdData"));
 
 if (!birds) {
   birds = [];
   for (let i = 0; i < 1200; i++) {
-    const name = parrotNames[i % parrotNames.length];
-    const rarity = rarities[Math.floor(Math.random()*rarities.length)];
+    const sp = species[Math.floor(Math.random()*species.length)];
+    const mut = mutations[Math.floor(Math.random()*mutations.length)];
+    let status = statuses[Math.floor(Math.random()*statuses.length)];
+
+    // Mantık düzeltmesi
+    if (sp === "Saka Kuşu") status = statuses[2];
+    if (sp === "Toy Kuşu") status = statuses[3];
+
     birds.push({
-      id: i+1,
-      name,
-      rarity,
-      img: `https://source.unsplash.com/400x300/?parrot,${name}`
+      name: `${mut} ${sp}`,
+      status,
+      img: `https://source.unsplash.com/400x300/?bird,${sp}`
     });
   }
-  localStorage.setItem("birds", JSON.stringify(birds));
+  localStorage.setItem("birdData", JSON.stringify(birds));
 }
 
 const list = document.getElementById("list");
@@ -75,8 +89,8 @@ function render(filter="") {
       div.innerHTML = `
         <img src="${b.img}">
         <h3>${b.name}</h3>
-        <span class="badge" style="background:${b.rarity.color}">
-          ${b.rarity.name}
+        <span class="badge" style="background:${b.status.color}">
+          ${b.status.name}
         </span>
       `;
       list.appendChild(div);
