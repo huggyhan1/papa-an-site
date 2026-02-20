@@ -5,58 +5,132 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>İlk Yardım ve Sakatlanmalar</title>
 <style>
-body{font-family:Arial;margin:0;padding:0;background:#f4f4f4;}
-header{background:#2196f3;color:white;padding:12px;text-align:center;}
-.container{padding:15px;}
-button{padding:8px 12px;margin:5px;border:none;border-radius:5px;background:#2196f3;color:white;cursor:pointer;}
-button:disabled{background:#aaa;}
-.page{display:none;}
-.active{display:block;}
-.quiz input{margin-right:6px;}
-.result{font-weight:bold;margin-top:10px;}
+/* Genel stil */
+body {
+  font-family: Arial, sans-serif;
+  margin:0;
+  background: #f2f2f2;
+}
+header {
+  background: #2196f3;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+input {
+  width: 90%;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  margin-top: 10px;
+  font-size: 16px;
+}
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 15px;
+}
+.page {
+  display: none;
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.page.active { display: block; }
+button {
+  padding: 10px 16px;
+  margin: 5px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #2196f3;
+  color: white;
+  font-size: 16px;
+}
+button:disabled { background: #aaa; cursor: default; }
+.quiz input { margin-right: 6px; }
+.result { font-weight: bold; margin-top: 10px; }
+.progress {
+  height: 10px;
+  background: #ddd;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+.progress-bar {
+  height: 10px;
+  background: #2196f3;
+  width: 0%;
+  border-radius: 5px;
+}
 </style>
 </head>
 <body>
 
 <header>
-<h2>İlk Yardım ve Sakatlanmalara Yardım</h2>
+  <h2>İlk Yardım ve Sakatlanmalara Yardım</h2>
 </header>
 
 <div class="container">
-<div id="pages"></div>
-
-<button id="prev">Önceki</button>
-<button id="next">Sonraki</button>
+  <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+  <div id="pages"></div>
+  <div style="text-align:center;">
+    <button id="prev">Önceki</button>
+    <button id="next">Sonraki</button>
+  </div>
 </div>
 
 <script>
 // ------------------------
 // Sayfalar (20 sayfa örnek)
-const pageContents = [];
-for(let i=1;i<=20;i++){
-  pageContents.push(`Sayfa ${i}: Bu bölümde ilk yardımın temel bilgileri ve sakatlanmalara yardım konusunu anlatıyoruz. İçerik detayları buraya gelecek.`);
-}
+const pageContents = [
+  "Sayfa 1: Temel İlk Yardım Bilgisi: İlk yardımın amacı, güvenli alan sağlamak ve hayat kurtarmaktır.",
+  "Sayfa 2: Kanama Durumunda Ne Yapmalı: Temiz bir bezle basınç uygulayın ve gerekiyorsa bandajlayın.",
+  "Sayfa 3: Kırık veya Burkulmalarda Ne Yapmalı: Etkilenen bölgeyi sabitleyin, hareket ettirmeyin.",
+  "Sayfa 4: Yanıklarda İlk Müdahale: Yanık bölgesini soğuk suyla yıkayın, kabarcıkları patlatmayın.",
+  "Sayfa 5: Bayılma Durumu: Kişiyi sırt üstü yatırın, bacaklarını hafif kaldırın, solunum kontrolü yapın.",
+  "Sayfa 6: Şok Durumu: Şok geçiren kişiyi yatay yatırın, sakinleştirin, ayaklarını hafif kaldırın.",
+  "Sayfa 7: Boğulma / Solunum Problemleri: Heimlich manevrasını uygulayın, gerekirse CPR yapın.",
+  "Sayfa 8: Zehirlenmeler: Zehirlenen kişiyi kusturmaya çalışmayın, güvenli alan sağlayın, acil çağrı yapın.",
+  "Sayfa 9: Kas-İskelet Yaralanmaları: Burkulmalar için buz uygulayın, kırıklar için sabitleyin.",
+  "Sayfa 10: Göz Yaralanmaları: Yabancı cisim varsa göz kapaklarını zorlamadan yıkayın.",
+  "Sayfa 11: Kulak Yaralanmaları: Kulak kanaması varsa temiz bir bezle bastırın, müdahalede dikkatli olun.",
+  "Sayfa 12: Diş / Ağız Yaralanmaları: Kanama varsa temiz gazlı bez uygulayın, dişi düşürülmüşse saklayın.",
+  "Sayfa 13: Sırt ve Omurga Yaralanmaları: Kişiyi sabit tutun, hareket ettirmeyin.",
+  "Sayfa 14: Isı Çarpması ve Hipotermi: Kişiyi serin veya sıcak ortamda uygun pozisyonda tutun.",
+  "Sayfa 15: Elektrik Çarpması: Güvenliği sağlayın, kişi bilinci kapalıysa CPR uygulayın.",
+  "Sayfa 16: Hayvan Isırıkları: Yara temizliği yapın, gerekirse tıbbi yardım alın.",
+  "Sayfa 17: Spor Yaralanmaları: Burkulma, düşme, kas çekmeleri için uygun ilk yardım uygulayın.",
+  "Sayfa 18: Taşınma ve Destekleme Teknikleri: Yaralanmayı önlemek için uygun kaldırma ve destekleme yapın.",
+  "Sayfa 19: Acil Yardım Çağrısı: Ambulans çağırırken adres ve durumu net anlatın.",
+  "Sayfa 20: Özet ve Önlem Notları: İlk yardım temel bilgilerini tekrar edin ve güvenliği ön planda tutun."
+];
 
 // ------------------------
-// Quiz soruları (10 soru örnek)
+// Quiz soruları (10 soru rastgele)
 const quizQuestions = [
-  {q:"Kanama varsa önce ne yapmalıyız?", a:["Basınç uygulamak","Vazgeçmek","Ağrıyı ölçmek"], correct:0},
-  {q:"Kırık bir kolu taşırken ne yapmalıyız?", a:["Sabit tutmak","Hızlı hareket etmek","Çıkarmak"], correct:0},
-  {q:"Bayılan kişiye ne yapılır?", a:["Yere yatırmak","Ayağa kaldırmak","Hiçbir şey yapmamak"], correct:0},
-  {q:"Yanıkta ilk müdahale?", a:["Soğuk su uygulamak","Ateşe tutmak","Krem sürmek"], correct:0},
-  {q:"Boğulma durumunda?", a:["Heimlich uygulamak","Su içirmek","Sallamak"], correct:0},
-  {q:"Şok geçiren kişiye ne yapılır?", a:["Yatırmak ve sakinleştirmek","Hızla hareket ettirmek","Yalnız bırakmak"], correct:0},
-  {q:"Burkulma için ilk yardım?", a:["Buz uygulamak ve sabitlemek","Sıcak kompres","Sallamak"], correct:0},
-  {q:"Elektirik çarpması sonrası?", a:["Güvenliği sağlamak","Hemen dokunmak","Suya sokmak"], correct:0},
-  {q:"Bilinci kapalı kişiye ne yapılır?", a:["Hava yolunu açmak","İçecek vermek","Yürütmek"], correct:0},
-  {q:"Küçük kesikler için?", a:["Temizleyip bandajlamak","Hiçbir şey yapmamak","Sıcak su tutmak"], correct:0}
+  {q:"Kanama varsa önce ne yapmalıyız?", a:["Basınç uygulamak","Vazgeçmek","Ağrıyı ölçmek"], correct:0, explain:"Kanamayı durdurmak için temiz bezle basınç uygulanmalıdır."},
+  {q:"Kırık bir kolu taşırken ne yapmalıyız?", a:["Sabit tutmak","Hızlı hareket etmek","Çıkarmak"], correct:0, explain:"Kırık bölge sabit tutulmalı, hareket ettirilmemelidir."},
+  {q:"Bayılan kişiye ne yapılır?", a:["Yere yatırmak","Ayağa kaldırmak","Hiçbir şey yapmamak"], correct:0, explain:"Bayılan kişi sırt üstü yatırılır, bacaklar hafif kaldırılır."},
+  {q:"Yanıkta ilk müdahale?", a:["Soğuk su uygulamak","Ateşe tutmak","Krem sürmek"], correct:0, explain:"Yanık bölgesi soğuk suyla yıkanmalı, kabarcık patlatılmamalıdır."},
+  {q:"Boğulma durumunda?", a:["Heimlich uygulamak","Su içirmek","Sallamak"], correct:0, explain:"Heimlich manevrası boğulma durumunda uygulanır."},
+  {q:"Şok geçiren kişiye ne yapılır?", a:["Yatırmak ve sakinleştirmek","Hızla hareket ettirmek","Yalnız bırakmak"], correct:0, explain:"Şok geçiren kişi yatay pozisyonda tutulmalı ve sakinleştirilmelidir."},
+  {q:"Burkulma için ilk yardım?", a:["Buz uygulamak ve sabitlemek","Sıcak kompres","Sallamak"], correct:0, explain:"Burkulmalarda bölgeye buz uygulanır ve sabitlenir."},
+  {q:"Elektrik çarpması sonrası?", a:["Güvenliği sağlamak","Hemen dokunmak","Suya sokmak"], correct:0, explain:"Önce çevre güvenliği sağlanmalı, kişi bilinci kapalıysa CPR yapılır."},
+  {q:"Bilinci kapalı kişiye ne yapılır?", a:["Hava yolunu açmak","İçecek vermek","Yürütmek"], correct:0, explain:"Bilinci kapalı kişinin hava yolu açılmalı, hareket ettirilmemelidir."},
+  {q:"Küçük kesikler için?", a:["Temizleyip bandajlamak","Hiçbir şey yapmamak","Sıcak su tutmak"], correct:0, explain:"Kesik temizlenip uygun şekilde bandajlanmalıdır."}
 ];
 
 let currentPage = 0;
 const pagesDiv = document.getElementById("pages");
+const progressBar = document.getElementById("progressBar");
 
 // ------------------------
-// Sayfaları render et
+// Render sayfalar
 function renderPages(){
   pagesDiv.innerHTML = "";
   pageContents.forEach((c,i)=>{
@@ -78,9 +152,8 @@ function renderPages(){
     }
     pagesDiv.appendChild(div);
   });
+  updateProgress();
 }
-
-renderPages();
 
 // ------------------------
 // Button eventleri
@@ -94,6 +167,13 @@ document.getElementById("next").onclick = ()=>{
 function updatePages(){
   const allPages = document.querySelectorAll(".page");
   allPages.forEach((p,i)=>p.classList.toggle("active", i===currentPage));
+  updateProgress();
+}
+
+// ------------------------
+// Progress bar
+function updateProgress(){
+  progressBar.style.width = ((currentPage+1)/pageContents.length*100)+"%";
 }
 
 // ------------------------
@@ -105,10 +185,18 @@ document.addEventListener("click", e=>{
       const selected = document.querySelector(`input[name=q${qi}]:checked`);
       if(selected && parseInt(selected.value)===q.correct) score++;
     });
-    document.getElementById("quizResult").innerText=`Doğru cevap sayısı: ${score} / ${quizQuestions.length}`;
+    let resultText = `Doğru cevap sayısı: ${score} / ${quizQuestions.length}<br>`;
+    quizQuestions.forEach((q,qi)=>{
+      const selected = document.querySelector(`input[name=q${qi}]:checked`);
+      if(!selected || parseInt(selected.value)!==q.correct){
+        resultText += `<b>${qi+1}. ${q.q}</b> - Doğru: ${q.a[q.correct]}<br>Not: ${q.explain}<br>`;
+      }
+    });
+    document.getElementById("quizResult").innerHTML = resultText;
   }
 });
 
+renderPages();
 </script>
 
 </body>
