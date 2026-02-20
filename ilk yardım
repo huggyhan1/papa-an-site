@@ -34,8 +34,8 @@ label{display:block;margin:6px 0;cursor:pointer;}
 </div>
 <script>
 // -------------------------
-// 50 Sayfa İçerik Örneği
-const pages = Array.from({length:50},(_,i)=>`Sayfa ${i+1}: İlk yardım rehberi ve sakatlanmalara müdahale bilgisi, örnek uygulama ve öneriler.`);
+// 50 Soru/İçerik Örneği
+const pages = Array.from({length:50},(_,i)=>`Soru ${i+1}: İlk yardım rehberi ve sakatlanmalara müdahale bilgisi, örnek uygulama ve öneriler.`);
 
 // -------------------------
 // 50 Quiz Sorusu Örneği
@@ -53,12 +53,12 @@ function render(){
   const content = document.getElementById("content");
   content.innerHTML = "";
   if(current < pages.length){
-    content.innerHTML = `<div class="card"><h3>Sayfa ${current+1}</h3><p>${pages[current]}</p></div>`;
+    content.innerHTML = `<div class="card"><h3>${pages[current].split(":")[0]}</h3><p>${pages[current].split(":")[1]}</p></div>`;
   }else{
     let quizHTML = `<div class="card"><h3>Quiz</h3>`;
     quiz.forEach((item,i)=>{
       quizHTML += `<div class="quiz-question" id="qdiv${i}">
-        <p>${i+1}. ${item.q}</p>
+        <p>${item.q}</p>
         ${item.a.map((opt,oi)=>`<label><input type="radio" name="q${i}" value="${oi}"> ${opt}</label>`).join("")}
       </div>`;
     });
@@ -87,12 +87,15 @@ function checkQuiz(){
     const selected = document.querySelector(`input[name=q${i}]:checked`);
     const div = document.getElementById(`qdiv${i}`);
     div.classList.remove("wrong","correct");
-    if(selected && parseInt(selected.value)===item.c){
+    // eski açıklama kaldır
+    const oldExplain = div.querySelector(".explain");
+    if(oldExplain) oldExplain.remove();
+
+    if(selected && parseInt(selected.value) === item.c){
       score++;
       div.classList.add("correct");
     }else{
       div.classList.add("wrong");
-      // Yanlış cevabı gösterme
       let explainDiv = document.createElement("div");
       explainDiv.className="explain";
       explainDiv.innerHTML = `Doğru Cevap: ${item.a[item.c]} - ${item.explain}`;
