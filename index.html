@@ -2,105 +2,113 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Kuş Arşivi</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>İlk Yardım ve Sakatlanmalar</title>
 <style>
-body { margin:0; font-family:Arial; background:#f4f4f4 }
-header { background:#1976d2; padding:12px }
-input {
-  width:100%; padding:10px; font-size:16px;
-  border:none; border-radius:6px
-}
-.card {
-  background:white; margin:12px; padding:12px;
-  border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,.15)
-}
-.badge {
-  padding:4px 8px; border-radius:5px;
-  font-size:12px; color:white; display:inline-block
-}
-img {
-  width:100%; height:180px; object-fit:cover;
-  border-radius:6px; margin-bottom:8px
-}
+body{font-family:Arial;margin:0;padding:0;background:#f4f4f4;}
+header{background:#2196f3;color:white;padding:12px;text-align:center;}
+.container{padding:15px;}
+button{padding:8px 12px;margin:5px;border:none;border-radius:5px;background:#2196f3;color:white;cursor:pointer;}
+button:disabled{background:#aaa;}
+.page{display:none;}
+.active{display:block;}
+.quiz input{margin-right:6px;}
+.result{font-weight:bold;margin-top:10px;}
 </style>
 </head>
 <body>
 
 <header>
-  <input id="search" placeholder="Kuş ara...">
+<h2>İlk Yardım ve Sakatlanmalara Yardım</h2>
 </header>
 
-<div id="list"></div>
+<div class="container">
+<div id="pages"></div>
+
+<button id="prev">Önceki</button>
+<button id="next">Sonraki</button>
+</div>
 
 <script>
-const species = [
-  "Sultan Papağanı","Cennet Papağanı","Jako Papağanı",
-  "Macaw","Amazon Papağanı","Kakadu","Lori",
-  "Alexandrine Papağanı","Quaker Papağanı",
-  "Saka Kuşu","Bülbül","İspinoz","Kanarya",
-  "Flamingo","Turna","Toy Kuşu","Akbaba",
-  "Şahin","Kartal","Baykuş"
+// ------------------------
+// Sayfalar (20 sayfa örnek)
+const pageContents = [];
+for(let i=1;i<=20;i++){
+  pageContents.push(`Sayfa ${i}: Bu bölümde ilk yardımın temel bilgileri ve sakatlanmalara yardım konusunu anlatıyoruz. İçerik detayları buraya gelecek.`);
+}
+
+// ------------------------
+// Quiz soruları (10 soru örnek)
+const quizQuestions = [
+  {q:"Kanama varsa önce ne yapmalıyız?", a:["Basınç uygulamak","Vazgeçmek","Ağrıyı ölçmek"], correct:0},
+  {q:"Kırık bir kolu taşırken ne yapmalıyız?", a:["Sabit tutmak","Hızlı hareket etmek","Çıkarmak"], correct:0},
+  {q:"Bayılan kişiye ne yapılır?", a:["Yere yatırmak","Ayağa kaldırmak","Hiçbir şey yapmamak"], correct:0},
+  {q:"Yanıkta ilk müdahale?", a:["Soğuk su uygulamak","Ateşe tutmak","Krem sürmek"], correct:0},
+  {q:"Boğulma durumunda?", a:["Heimlich uygulamak","Su içirmek","Sallamak"], correct:0},
+  {q:"Şok geçiren kişiye ne yapılır?", a:["Yatırmak ve sakinleştirmek","Hızla hareket ettirmek","Yalnız bırakmak"], correct:0},
+  {q:"Burkulma için ilk yardım?", a:["Buz uygulamak ve sabitlemek","Sıcak kompres","Sallamak"], correct:0},
+  {q:"Elektirik çarpması sonrası?", a:["Güvenliği sağlamak","Hemen dokunmak","Suya sokmak"], correct:0},
+  {q:"Bilinci kapalı kişiye ne yapılır?", a:["Hava yolunu açmak","İçecek vermek","Yürütmek"], correct:0},
+  {q:"Küçük kesikler için?", a:["Temizleyip bandajlamak","Hiçbir şey yapmamak","Sıcak su tutmak"], correct:0}
 ];
 
-const mutations = [
-  "Normal","Albino","Lutino","Blue","Pied",
-  "Cinnamon","Opaline","White Face","Golden"
-];
+let currentPage = 0;
+const pagesDiv = document.getElementById("pages");
 
-const statuses = [
-  {name:"Evcil", color:"#4caf50"},
-  {name:"Vahşi", color:"#607d8b"},
-  {name:"Tükenmekte Olan", color:"#ff9800"},
-  {name:"Nesli Tükenen", color:"#f44336"}
-];
+// ------------------------
+// Sayfaları render et
+function renderPages(){
+  pagesDiv.innerHTML = "";
+  pageContents.forEach((c,i)=>{
+    const div = document.createElement("div");
+    div.className="page";
+    if(i===currentPage) div.classList.add("active");
+    div.innerHTML = `<p>${c}</p>`;
+    // Quiz sayfası
+    if(i===19){ // sayfa 20 quiz
+      div.innerHTML += "<h3>Quiz</h3>";
+      quizQuestions.forEach((q,qi)=>{
+        div.innerHTML += `<div class="quiz">
+          <p>${qi+1}. ${q.q}</p>
+          ${q.a.map((opt,oi)=>`<label><input type="radio" name="q${qi}" value="${oi}">${opt}</label>`).join("")}
+        </div>`;
+      });
+      div.innerHTML += `<button id="submitQuiz">Cevapları Kontrol Et</button>
+                        <div class="result" id="quizResult"></div>`;
+    }
+    pagesDiv.appendChild(div);
+  });
+}
 
-let birds = JSON.parse(localStorage.getItem("birdData"));
+renderPages();
 
-if (!birds) {
-  birds = [];
-  for (let i = 0; i < 1200; i++) {
-    const sp = species[Math.floor(Math.random()*species.length)];
-    const mut = mutations[Math.floor(Math.random()*mutations.length)];
-    let status = statuses[Math.floor(Math.random()*statuses.length)];
+// ------------------------
+// Button eventleri
+document.getElementById("prev").onclick = ()=>{
+  if(currentPage>0){ currentPage--; updatePages();}
+};
+document.getElementById("next").onclick = ()=>{
+  if(currentPage<pageContents.length-1){ currentPage++; updatePages();}
+};
 
-    // Mantık düzeltmesi
-    if (sp === "Saka Kuşu") status = statuses[2];
-    if (sp === "Toy Kuşu") status = statuses[3];
+function updatePages(){
+  const allPages = document.querySelectorAll(".page");
+  allPages.forEach((p,i)=>p.classList.toggle("active", i===currentPage));
+}
 
-    birds.push({
-      name: `${mut} ${sp}`,
-      status,
-      img: `https://source.unsplash.com/400x300/?bird,${sp}`
+// ------------------------
+// Quiz kontrol
+document.addEventListener("click", e=>{
+  if(e.target && e.target.id==="submitQuiz"){
+    let score = 0;
+    quizQuestions.forEach((q,qi)=>{
+      const selected = document.querySelector(`input[name=q${qi}]:checked`);
+      if(selected && parseInt(selected.value)===q.correct) score++;
     });
+    document.getElementById("quizResult").innerText=`Doğru cevap sayısı: ${score} / ${quizQuestions.length}`;
   }
-  localStorage.setItem("birdData", JSON.stringify(birds));
-}
+});
 
-const list = document.getElementById("list");
-
-function render(filter="") {
-  list.innerHTML = "";
-  birds
-    .filter(b => b.name.toLowerCase().includes(filter))
-    .forEach(b => {
-      const div = document.createElement("div");
-      div.className = "card";
-      div.innerHTML = `
-        <img src="${b.img}">
-        <h3>${b.name}</h3>
-        <span class="badge" style="background:${b.status.color}">
-          ${b.status.name}
-        </span>
-      `;
-      list.appendChild(div);
-    });
-}
-
-render();
-
-document.getElementById("search").oninput = e =>
-  render(e.target.value.toLowerCase());
 </script>
 
 </body>
